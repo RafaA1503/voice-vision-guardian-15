@@ -98,12 +98,16 @@ const ChatGPTVisionDetector = () => {
   const analyzeWithOpenAI = async (imageDataUrl: string, key: string): Promise<string> => {
     const prompt = `Analiza la imagen y responde en una sola frase en español:
 - Enumera brevemente los objetos principales (usa nombres simples: silla, mesa, persona, perro, etc.).
-- Si aparece un billete mexicano, indica su posible denominación y una valoración: "billete auténtico", "posible billete falso" o "no es posible confirmar autenticidad" (basado en rasgos visibles como ventana transparente, marca de agua, hilo de seguridad, relieve).`;
+- Si aparece un billete mexicano o peruano, indica:
+  * País y denominación (ej: "billete peruano de 10 soles", "billete mexicano de 50 pesos")
+  * Valoración de autenticidad: "billete auténtico", "posible billete falso" o "no es posible confirmar autenticidad"
+  * Para billetes mexicanos: busca ventana transparente, marca de agua, hilo de seguridad, relieve
+  * Para billetes peruanos: busca marca de agua, hilo de seguridad, relieve, ventana transparente, cambio de color`;
 
     const body = {
       model: 'gpt-4.1-mini',
       messages: [
-        { role: 'system', content: 'Eres un asistente de visión que responde de forma breve y clara en español latino.' },
+        { role: 'system', content: 'Eres un asistente de visión experto en billetes mexicanos y peruanos que responde de forma breve y clara en español latino.' },
         {
           role: 'user',
           content: [
@@ -150,7 +154,7 @@ const ChatGPTVisionDetector = () => {
       <div className="max-w-3xl mx-auto">
         <header className="mb-6 text-center">
           <h1 className="text-3xl font-bold">Asistente Visual Automático</h1>
-          <p className="text-white/70 mt-2">Detección de objetos y verificación de billetes usando ChatGPT Vision</p>
+          <p className="text-white/70 mt-2">Detección de objetos y verificación de billetes mexicanos y peruanos usando ChatGPT Vision</p>
         </header>
 
         <div className="relative rounded-2xl overflow-hidden border border-white/20 bg-black/40">
