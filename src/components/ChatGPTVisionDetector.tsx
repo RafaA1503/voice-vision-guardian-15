@@ -1,31 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 
-const OPENAI_KEY_STORAGE = 'OPENAI_API_KEY';
+const OPENAI_API_KEY = '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';
 
 const ChatGPTVisionDetector = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const intervalRef = useRef<number | null>(null);
 
-  const [apiKey, setApiKey] = useState<string | null>(null);
   const [isActive, setIsActive] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [status, setStatus] = useState<string>('Preparando sistema...');
   const [lastMessage, setLastMessage] = useState<string>('');
 
-  // Load API key and set document title
+  // Start camera automatically when component mounts
   useEffect(() => {
     document.title = 'Detector automático de objetos y billetes';
-    const key = localStorage.getItem(OPENAI_KEY_STORAGE);
-    if (key) setApiKey(key);
-  }, []);
-
-  // Start when apiKey is set
-  useEffect(() => {
-    if (!apiKey) return;
     startCamera();
     return () => stopAll();
-  }, [apiKey]);
+  }, []);
 
   const stopAll = () => {
     if (intervalRef.current) {
@@ -73,7 +65,7 @@ const ChatGPTVisionDetector = () => {
   };
 
   const analyzeFrame = async () => {
-    if (!apiKey || !videoRef.current || !canvasRef.current || isAnalyzing) return;
+    if (!videoRef.current || !canvasRef.current || isAnalyzing) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -89,7 +81,7 @@ const ChatGPTVisionDetector = () => {
     setStatus('Analizando imagen con ChatGPT...');
 
     try {
-      const message = await analyzeWithOpenAI(dataUrl, apiKey);
+      const message = await analyzeWithOpenAI(dataUrl, OPENAI_API_KEY);
       if (message) {
         setLastMessage(message);
         speak(message);
@@ -153,16 +145,6 @@ const ChatGPTVisionDetector = () => {
     window.speechSynthesis.speak(utter);
   };
 
-  const handleApiKeyInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      const value = (e.target as HTMLInputElement).value.trim();
-      if (value) {
-        localStorage.setItem(OPENAI_KEY_STORAGE, value);
-        setApiKey(value);
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4">
       <div className="max-w-3xl mx-auto">
@@ -179,23 +161,6 @@ const ChatGPTVisionDetector = () => {
           <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-sm bg-white/10 backdrop-blur border border-white/20">
             {isActive ? (isAnalyzing ? 'Analizando...' : 'Detectando...') : 'Preparando...'}
           </div>
-
-          {/* API key overlay when missing - no botones, confirmar con Enter */}
-          {!apiKey && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/70 p-6">
-              <div className="w-full max-w-md text-center">
-                <h2 className="text-xl font-semibold mb-2">Ingresa tu clave de API de OpenAI</h2>
-                <p className="text-white/70 mb-4 text-sm">Se guardará localmente y se usará solo desde tu navegador.</p>
-                <input
-                  type="password"
-                  placeholder="sk-... (presiona Enter para continuar)"
-                  onKeyDown={handleApiKeyInput}
-                  className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 outline-none placeholder-white/50"
-                  autoFocus
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Last message */}
