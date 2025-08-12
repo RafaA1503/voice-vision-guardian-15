@@ -243,7 +243,7 @@ const ChatGPTVisionDetector = () => {
   };
 
   return (
-    <section className="min-h-screen bg-background text-foreground">
+    <section className="min-h-screen text-foreground relative overflow-hidden futuristic-bg">
       <div className="container py-8">
         <header className="mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -254,7 +254,7 @@ const ChatGPTVisionDetector = () => {
           </p>
         </header>
 
-        <Card className="relative overflow-hidden">
+        <Card className="relative overflow-hidden glass-panel neon-ring">
           <CardContent className="p-0">
             <div className="relative">
               <video ref={videoRef} className="w-full aspect-video object-cover" playsInline muted />
@@ -273,7 +273,7 @@ const ChatGPTVisionDetector = () => {
           </CardContent>
         </Card>
 
-        <Card className="mt-6">
+        <Card className="mt-6 glass-panel neon-ring">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground" aria-live="polite">Estado: {status}</p>
             {lastHeard && (

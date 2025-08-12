@@ -8,51 +8,53 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Futuristic dark theme - neon accents */
+    --background: 222 58% 5%;
+    --foreground: 210 40% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 222 50% 7%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 222 50% 7%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Brand accents */
+    --primary: 260 86% 62%; /* neon violet */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 222 32% 14%;
+    --secondary-foreground: 210 40% 96%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 222 24% 12%;
+    --muted-foreground: 217 19% 70%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 190 92% 50%; /* neon cyan */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 222 26% 18%;
+    --input: 222 26% 18%;
+    --ring: 260 86% 62%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Sidebar tokens */
+    --sidebar-background: 222 58% 5%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 260 86% 62%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 32% 14%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 222 26% 18%;
+    --sidebar-ring: 260 86% 62%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Extras for glow/gradients */
+    --primary-glow: 260 86% 70%;
+    --accent-glow: 190 92% 60%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.25), 0 0 48px hsl(var(--accent) / 0.15);
   }
 
   .dark {
@@ -101,5 +103,27 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .futuristic-bg {
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(1200px 600px at 0% -10%, hsl(var(--primary) / 0.08), transparent 60%),
+      radial-gradient(800px 400px at 100% 0%, hsl(var(--accent) / 0.08), transparent 55%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 70%);
+  }
+
+  .glass-panel {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .neon-ring {
+    box-shadow: 0 0 0 1px hsl(var(--border)), 0 0 24px hsl(var(--primary) / 0.25);
   }
 }
