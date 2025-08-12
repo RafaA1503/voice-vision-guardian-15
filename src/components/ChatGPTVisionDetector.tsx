@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 
 const OPENAI_API_KEY = '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';
 
@@ -14,7 +16,29 @@ const ChatGPTVisionDetector = () => {
 
   // Start camera automatically when component mounts
   useEffect(() => {
-    document.title = 'Detector automático de objetos y billetes';
+    const title = 'Detector de objetos y billetes peruanos y mexicanos';
+    document.title = title;
+
+    // Meta description
+    const metaDescName = 'description';
+    let metaDesc = document.querySelector(`meta[name="${metaDescName}"]`) as HTMLMetaElement | null;
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.name = metaDescName;
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.content = 'Detector visual: objetos y billetes peruanos y mexicanos con análisis de autenticidad.';
+
+    // Canonical
+    const canonicalHref = window.location.href;
+    let linkEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!linkEl) {
+      linkEl = document.createElement('link');
+      linkEl.rel = 'canonical';
+      document.head.appendChild(linkEl);
+    }
+    linkEl.href = canonicalHref;
+
     startCamera();
     return () => stopAll();
   }, []);
@@ -150,32 +174,39 @@ const ChatGPTVisionDetector = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4">
-      <div className="max-w-3xl mx-auto">
-        <header className="mb-6 text-center">
-          <h1 className="text-3xl font-bold">Asistente Visual Automático</h1>
-          <p className="text-white/70 mt-2">Detección de objetos y verificación de billetes mexicanos y peruanos usando ChatGPT Vision</p>
+    <section className="min-h-screen bg-background text-foreground">
+      <div className="container py-8">
+        <header className="mb-8 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Asistente visual: objetos y billetes
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Detección automática de objetos y billetes peruanos y mexicanos con verificación básica de autenticidad.
+          </p>
         </header>
 
-        <div className="relative rounded-2xl overflow-hidden border border-white/20 bg-black/40">
-          <video ref={videoRef} className="w-full h-[360px] object-cover" playsInline muted />
-          <canvas ref={canvasRef} className="hidden" />
+        <Card className="relative overflow-hidden">
+          <CardContent className="p-0">
+            <div className="relative">
+              <video ref={videoRef} className="w-full aspect-video object-cover" playsInline muted />
+              <canvas ref={canvasRef} className="hidden" />
+              <Badge variant="secondary" className="absolute top-3 left-3">
+                {isActive ? (isAnalyzing ? 'Analizando…' : 'Detectando…') : 'Preparando…'}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Status overlay */}
-          <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-sm bg-white/10 backdrop-blur border border-white/20">
-            {isActive ? (isAnalyzing ? 'Analizando...' : 'Detectando...') : 'Preparando...'}
-          </div>
-        </div>
-
-        {/* Last message */}
-        <div className="mt-6 bg-white/10 backdrop-blur rounded-2xl p-4 border border-white/20">
-          <p className="text-sm text-white/70">Estado: {status}</p>
-          {lastMessage && (
-            <p className="mt-2 text-lg">{lastMessage}</p>
-          )}
-        </div>
+        <Card className="mt-6">
+          <CardContent className="p-4">
+            <p className="text-sm text-muted-foreground" aria-live="polite">Estado: {status}</p>
+            {lastMessage && (
+              <p className="mt-2 text-lg leading-relaxed">{lastMessage}</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </section>
   );
 };
 
