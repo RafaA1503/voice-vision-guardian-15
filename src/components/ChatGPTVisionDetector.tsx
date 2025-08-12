@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Mic, Activity } from 'lucide-react';
 
 const OPENAI_API_KEY = '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';
 
@@ -13,6 +14,9 @@ const ChatGPTVisionDetector = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [status, setStatus] = useState<string>('Preparando sistema...');
   const [lastMessage, setLastMessage] = useState<string>('');
+  const recognitionRef = useRef<any>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [lastHeard, setLastHeard] = useState<string>('');
 
   // Start camera automatically when component mounts
   useEffect(() => {
@@ -40,7 +44,8 @@ const ChatGPTVisionDetector = () => {
     linkEl.href = canonicalHref;
 
     startCamera();
-    return () => stopAll();
+    startSpeechRecognition();
+    return () => { stopAll(); stopSpeechRecognition(); };
   }, []);
 
   const stopAll = () => {
@@ -55,6 +60,70 @@ const ChatGPTVisionDetector = () => {
       videoRef.current.srcObject = null;
     }
     setIsActive(false);
+  };
+
+  // Reconocimiento de voz continuo (Web Speech API)
+  const startSpeechRecognition = () => {
+    try {
+      const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SR) {
+        setStatus((s) => s + ' | Reconocimiento de voz no soportado');
+        return;
+      }
+      const rec = new SR();
+      rec.lang = 'es-ES';
+      rec.continuous = true;
+      rec.interimResults = false;
+      rec.onstart = () => setIsListening(true);
+      rec.onend = () => {
+        setIsListening(false);
+        // reintentar automáticamente para mantener la escucha activa
+        try { rec.start(); } catch { /* noop */ }
+      };
+      rec.onerror = (e: any) => {
+        console.error('SpeechRecognition error', e);
+        setIsListening(false);
+      };
+      rec.onresult = (e: any) => {
+        const result = e.results[e.results.length - 1];
+        if (!result) return;
+        const isFinal = result.isFinal;
+        const text: string = (result[0]?.transcript || '').trim().toLowerCase();
+        if (!text) return;
+        setLastHeard(text);
+        if (isFinal) handleVoiceCommand(text);
+      };
+      recognitionRef.current = rec;
+      rec.start();
+    } catch (err) {
+      console.error('No se pudo iniciar el reconocimiento de voz:', err);
+    }
+  };
+
+  const stopSpeechRecognition = () => {
+    const rec = recognitionRef.current;
+    if (rec) {
+      try {
+        rec.onend = null;
+        rec.stop();
+      } catch { /* noop */ }
+    }
+    recognitionRef.current = null;
+    setIsListening(false);
+  };
+
+  const handleVoiceCommand = async (text: string) => {
+    const queries = [
+      'qué hay adelante', 'que hay adelante',
+      'qué hay enfrente', 'que hay enfrente',
+      'qué ves', 'que ves',
+      'que hay al frente', 'qué hay al frente'
+    ];
+    if (queries.some((q) => text.includes(q))) {
+      speak('Analizando lo que hay adelante.');
+      await analyzeFrame();
+      return;
+    }
   };
 
   const startCamera = async () => {
@@ -193,6 +262,13 @@ const ChatGPTVisionDetector = () => {
               <Badge variant="secondary" className="absolute top-3 left-3">
                 {isActive ? (isAnalyzing ? 'Analizando…' : 'Detectando…') : 'Preparando…'}
               </Badge>
+              <div className="absolute top-3 right-3 flex items-center gap-2">
+                <Badge variant={isListening ? 'default' : 'secondary'} className="flex items-center gap-1">
+                  <Mic className="h-3.5 w-3.5" />
+                  {isListening ? 'Escuchando' : 'Mic apagado'}
+                </Badge>
+                {isAnalyzing && <Activity className="h-4 w-4 text-primary animate-pulse" aria-hidden />}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -200,6 +276,9 @@ const ChatGPTVisionDetector = () => {
         <Card className="mt-6">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground" aria-live="polite">Estado: {status}</p>
+            {lastHeard && (
+              <p className="text-xs text-muted-foreground mt-1">Último comando: “{lastHeard}”</p>
+            )}
             {lastMessage && (
               <p className="mt-2 text-lg leading-relaxed">{lastMessage}</p>
             )}
