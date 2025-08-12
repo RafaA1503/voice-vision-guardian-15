@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Mic, Activity } from 'lucide-react';
+import { Mic, Activity, Sun, Moon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { useTheme } from 'next-themes';
 
 const OPENAI_API_KEY = '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';
 
@@ -17,9 +21,14 @@ const ChatGPTVisionDetector = () => {
   const recognitionRef = useRef<any>(null);
   const [isListening, setIsListening] = useState(false);
   const [lastHeard, setLastHeard] = useState<string>('');
+  const [autoDetect, setAutoDetect] = useState(false); // Manual por defecto para ahorrar costos
+  const [lowPower, setLowPower] = useState(true); // Ahorro activado por defecto
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   // Start camera automatically when component mounts
   useEffect(() => {
+    setMounted(true);
     const title = 'Detector de objetos y billetes peruanos y mexicanos';
     document.title = title;
 
@@ -126,6 +135,27 @@ const ChatGPTVisionDetector = () => {
     }
   };
 
+  const handleToggleAuto = (value: boolean) => {
+    setAutoDetect(value);
+    if (value) {
+      beginLoop();
+    } else if (intervalRef.current) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  const handleToggleLowPower = (value: boolean) => {
+    setLowPower(value);
+    if (autoDetect) {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      beginLoop();
+    }
+  };
+
   const startCamera = async () => {
     try {
       setStatus('Solicitando acceso a la cámara...');
@@ -137,9 +167,10 @@ const ChatGPTVisionDetector = () => {
       videoRef.current.srcObject = stream;
       await videoRef.current.play();
       setIsActive(true);
-      setStatus('Cámara activa. Analizando entorno...');
-      speak('Cámara activada. Comenzando detección automática.');
-      beginLoop();
+      setStatus('Cámara activa. Listo para analizar.');
+      speak('Cámara activada. Detección por voz lista. El modo ahorro está ' + (lowPower ? 'activado' : 'desactivado') + '.');
+      // No iniciamos el bucle por defecto para ahorrar costos
+      if (autoDetect) beginLoop();
     } catch (e) {
       console.error(e);
       setStatus('No se pudo acceder a la cámara. Revisa permisos.');
@@ -149,12 +180,10 @@ const ChatGPTVisionDetector = () => {
 
   const beginLoop = () => {
     if (intervalRef.current) window.clearInterval(intervalRef.current);
-    // analyze every 5 seconds
+    const intervalMs = lowPower ? 30000 : 10000; // Reducir llamadas para ahorrar
     intervalRef.current = window.setInterval(() => {
       analyzeFrame();
-    }, 5000);
-    // Run first analysis ASAP
-    analyzeFrame();
+    }, intervalMs);
   };
 
   const analyzeFrame = async () => {
@@ -165,10 +194,12 @@ const ChatGPTVisionDetector = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx || video.videoWidth === 0 || video.videoHeight === 0) return;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const maxWidth = lowPower ? 512 : 768;
+    const scale = Math.min(1, maxWidth / video.videoWidth);
+    canvas.width = Math.floor(video.videoWidth * scale);
+    canvas.height = Math.floor(video.videoHeight * scale);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+    const dataUrl = canvas.toDataURL('image/jpeg', lowPower ? 0.5 : 0.7);
 
     setIsAnalyzing(true);
     setStatus('Analizando imagen con ChatGPT...');

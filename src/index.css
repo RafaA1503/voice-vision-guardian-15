@@ -8,53 +8,53 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Futuristic dark theme - neon accents */
-    --background: 222 58% 5%;
-    --foreground: 210 40% 96%;
+    /* Futuristic light theme - soft surface with neon accents */
+    --background: 220 20% 98%;
+    --foreground: 222 60% 8%;
 
-    --card: 222 50% 7%;
-    --card-foreground: 210 40% 96%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 60% 8%;
 
-    --popover: 222 50% 7%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 60% 8%;
 
     /* Brand accents */
-    --primary: 260 86% 62%; /* neon violet */
+    --primary: 260 86% 56%; /* neon violet */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 32% 14%;
-    --secondary-foreground: 210 40% 96%;
+    --secondary: 220 18% 92%;
+    --secondary-foreground: 222 60% 8%;
 
-    --muted: 222 24% 12%;
-    --muted-foreground: 217 19% 70%;
+    --muted: 220 16% 90%;
+    --muted-foreground: 222 10% 35%;
 
-    --accent: 190 92% 50%; /* neon cyan */
+    --accent: 190 92% 45%; /* neon cyan */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 222 26% 18%;
-    --input: 222 26% 18%;
-    --ring: 260 86% 62%;
+    --border: 220 14% 88%;
+    --input: 220 14% 88%;
+    --ring: 260 86% 56%;
 
     --radius: 0.75rem;
 
     /* Sidebar tokens */
-    --sidebar-background: 222 58% 5%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 260 86% 62%;
+    --sidebar-background: 220 20% 98%;
+    --sidebar-foreground: 222 60% 8%;
+    --sidebar-primary: 260 86% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 32% 14%;
-    --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 222 26% 18%;
-    --sidebar-ring: 260 86% 62%;
+    --sidebar-accent: 220 18% 92%;
+    --sidebar-accent-foreground: 222 60% 8%;
+    --sidebar-border: 220 14% 88%;
+    --sidebar-ring: 260 86% 56%;
 
     /* Extras for glow/gradients */
-    --primary-glow: 260 86% 70%;
-    --accent-glow: 190 92% 60%;
+    --primary-glow: 260 86% 65%;
+    --accent-glow: 190 92% 55%;
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
-    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.25), 0 0 48px hsl(var(--accent) / 0.15);
+    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.18), 0 0 48px hsl(var(--accent) / 0.12);
   }
 
   .dark {
